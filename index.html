@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fafafa" />
+  <title>Desk Strength Checklist + Streaks</title>
+  <style>
+    :root {
+      --bg: #f7f7f8;
+      --card: #ffffff;
+      --text: #111111;
+      --muted: #686868;
+      --line: #e7e7ea;
+      --soft: #f1f1f3;
+      --soft-2: #fbfbfc;
+      --done: #111111;
+      --radius: 22px;
+      --tap: 48px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-height: 100%;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.38;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior-y: contain;
+    }
+
+    main {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: calc(14px + env(safe-area-inset-top)) 14px calc(28px + env(safe-area-inset-bottom));
+    }
+
+    header {
+      padding: 4px 2px 14px;
+    }
+
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.1rem, 10vw, 3.15rem);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+    }
+
+    .intro {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 34rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 12px 38px rgba(17, 17, 17, 0.06);
+    }
+
+    .top {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #fbfbfc 100%);
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1.55rem, 7vw, 2rem);
+      line-height: 1.04;
+      letter-spacing: -0.05em;
+    }
+
+    .meta {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .badge {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text);
+      background: var(--soft);
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    .description {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .progress-wrap { margin-top: 18px; }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .progress {
+      height: 9px;
+      background: var(--soft);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar {
+      width: 0%;
+      height: 100%;
+      background: var(--text);
+      transition: width 180ms ease;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 8px 10px;
+      background: #ffffff;
+      min-width: 0;
+      text-align: center;
+    }
+
+    .stat-number {
+      display: block;
+      font-size: clamp(1.45rem, 7vw, 1.9rem);
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: -0.055em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+      line-height: 1.15;
+    }
+
+    .goal-line {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      text-align: center;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      appearance: none;
+      width: 100%;
+      min-height: var(--tap);
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--text);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    button:active { transform: scale(0.99); }
+
+    .note {
+      margin: 14px 0 0;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: var(--muted);
+      background: var(--soft);
+      font-size: 0.84rem;
+    }
+
+    section {
+      padding: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    section:first-of-type { border-top: 0; }
+
+    h3 {
+      margin: 0 0 12px;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    li {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 13px 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--soft-2);
+    }
+
+    input[type="checkbox"] {
+      width: 28px;
+      height: 28px;
+      margin: 0;
+      accent-color: var(--done);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    label {
+      display: block;
+      min-height: 28px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .name {
+      display: block;
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      font-size: 0.98rem;
+    }
+
+    .detail {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    li.complete {
+      background: #ffffff;
+      border-color: #eeeeef;
+    }
+
+    li.complete .name,
+    li.complete .detail {
+      color: #a0a0a0;
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+    }
+
+    .schedule {
+      margin: 16px 2px 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      text-align: center;
+    }
+
+    .schedule strong { color: var(--text); }
+
+    footer {
+      margin: 12px 6px 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .preview-note {
+      display: none;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    body.preview .preview-note { display: block; }
+
+    @media (min-width: 640px) {
+      main {
+        max-width: 720px;
+        padding-top: 32px;
+      }
+
+      .top, section { padding: 22px; }
+
+      li {
+        grid-template-columns: 28px 1fr;
+        padding: 13px 14px;
+      }
+
+      input[type="checkbox"] { width: 24px; height: 24px; }
+
+      .stats { gap: 10px; }
+      .stat { text-align: left; padding: 14px; }
+      .stat-label { font-size: 0.72rem; }
+      .goal-line { text-align: left; }
+      button { width: auto; min-width: 140px; }
+    }
+
+    @media (max-width: 360px) {
+      main { padding-left: 10px; padding-right: 10px; }
+      .top, section { padding: 14px; }
+      .stats { gap: 6px; }
+      .stat { padding: 10px 5px 8px; border-radius: 14px; }
+      .stat-label { font-size: 0.56rem; }
+      li { padding: 12px 10px; grid-template-columns: 30px 1fr; }
+      input[type="checkbox"] { width: 26px; height: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="kicker">Desk-only strength</p>
+      <h1>Daily Desk Workout</h1>
+      <p class="intro">A 5-day full-body checklist made for quick desk breaks. Complete any 3 weekdays to hit your weekly goal.</p>
+      <p id="previewNote" class="preview-note">Preview mode is active. Remove the day from the URL to return to automatic daily display.</p>
+    </header>
+
+    <article class="card" aria-live="polite">
+      <div class="top">
+        <div class="row">
+          <div>
+            <h2 id="workoutTitle">Loading workout...</h2>
+            <p class="meta" id="dateLine"></p>
+          </div>
+          <span class="badge" id="dayBadge">Today</span>
+        </div>
+        <p class="description" id="workoutDescription"></p>
+
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span id="progressText">0 of 0 complete</span>
+            <span id="percentText">0%</span>
+          </div>
+          <div class="progress" role="progressbar" aria-label="Workout progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="bar" id="progressFill"></div>
+          </div>
+        </div>
+
+        <div class="stats" aria-label="Workout tracking stats">
+          <div class="stat">
+            <span class="stat-number" id="streakStat">0</span>
+            <span class="stat-label">Daily streak</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number" id="weekCompleteStat">0</span>
+            <span class="stat-label">Done this week</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number" id="weekMissStat">0</span>
+            <span class="stat-label">Misses this week</span>
+          </div>
+        </div>
+        <p class="goal-line" id="goalLine">Weekly goal: complete any 3 desk workouts.</p>
+
+        <div class="buttons">
+          <button type="button" class="secondary" id="resetBtn">Reset today</button>
+        </div>
+
+        <p class="note">Use a stable chair and desk. Move slowly, brace your core, and stop for sharp pain, dizziness, numbness, chest pain, or worsening back pain.</p>
+      </div>
+
+      <div id="sections"></div>
+    </article>
+
+    <p class="schedule"><strong>Schedule:</strong> Monday–Friday are full-body desk workouts. Weekends are optional.</p>
+    <footer>Checks and stats save in this browser. A day counts as done when every item is checked.</footer>
+  </main>
+
+  <script>
+    const WORKOUTS = {
+      1: {
+        badge: 'Monday',
+        title: 'Full Body A',
+        description: 'Desk strength basics: squat pattern, push, posture/back, core, calves, and glutes.',
+        sections: [
+          {
+            title: 'Warm-up',
+            items: [
+              ['Seated posture reset', '30 seconds. Sit tall, feet flat, shoulders relaxed, chin slightly tucked.'],
+              ['Shoulder rolls', '10 forward and 10 backward. Slow and controlled.'],
+              ['Seated march', '20 total reps. Lift knees gently while bracing your core.']
+            ]
+          },
+          {
+            title: 'Workout — 2 to 3 rounds',
+            items: [
+              ['Chair sit-to-stands', '10–15 reps. Stand up, sit back down slowly, avoid using your hands.'],
+              ['Desk incline push-ups', '8–15 reps. Hands on desk, body straight, lower with control.'],
+              ['Desk-edge isometric row', '8 reps with 5-second holds. Hold a sturdy desk edge and gently pull as if rowing.'],
+              ['Seated knee lifts', '10–12 each side. Sit tall; lift one knee without leaning back.'],
+              ['Standing calf raises', '15–25 reps. Hold the desk lightly, pause at the top, lower slowly.'],
+              ['Standing glute squeezes', '8 holds of 5–10 seconds. Squeeze without arching your back.']
+            ]
+          }
+        ]
+      },
+      2: {
+        badge: 'Tuesday',
+        title: 'Full Body B',
+        description: 'Controlled legs, triceps/chest, desk plank, posture, core, and hips.',
+        sections: [
+          {
+            title: 'Warm-up',
+            items: [
+              ['Desk-supported hip hinges', '10 slow reps. Hands on desk, hips back, back neutral.'],
+              ['Scapular squeezes', '10 reps. Pull shoulder blades back and down.'],
+              ['Calf pumps', '20 total reps. Move through a comfortable range.']
+            ]
+          },
+          {
+            title: 'Workout — 2 to 3 rounds',
+            items: [
+              ['Chair squat hover', '6–10 reps with 3-second holds. Pause just above the chair, then stand.'],
+              ['Close-grip desk push-ups', '6–12 reps. Hands closer than shoulder-width.'],
+              ['Desk plank', '20–45 seconds. Forearms or hands on desk, body straight, abs braced.'],
+              ['Seated leg extensions', '10–15 each leg. Straighten one leg, squeeze thigh, lower slowly.'],
+              ['Desk-supported hip abductions', '10–15 each side. Move one leg out to the side without leaning.'],
+              ['Scapular squeezes', '12–15 reps. Keep shoulders down, no shrugging.']
+            ]
+          }
+        ]
+      },
+      3: {
+        badge: 'Wednesday',
+        title: 'Full Body C',
+        description: 'Lower-body endurance, desk push, posture/back activation, calves, and abs.',
+        sections: [
+          {
+            title: 'Warm-up',
+            items: [
+              ['Seated core brace', '5 holds of 8–10 seconds. Tighten abs and keep breathing.'],
+              ['Arm circles', '10 forward and 10 backward.'],
+              ['Easy chair sit-to-stands', '8 smooth reps.']
+            ]
+          },
+          {
+            title: 'Workout — 2 to 3 rounds',
+            items: [
+              ['Desk-supported split squat', '8–10 each leg. Hold the desk lightly; use a small range if needed.'],
+              ['Desk incline push-ups', '8–15 reps. Step feet farther back to increase difficulty.'],
+              ['Desk-edge isometric row', '8 reps with 5-second holds. Pull gently against the desk edge.'],
+              ['Seated alternating knee lifts', '20 total reps. Brace core and keep chest tall.'],
+              ['Standing calf raises', '20 reps. Pause at the top.'],
+              ['Chair hover hold', '15–30 seconds. Hover just above the chair; skip if knees bother you.']
+            ]
+          }
+        ]
+      },
+      4: {
+        badge: 'Thursday',
+        title: 'Full Body D',
+        description: 'Slower reps and isometric holds for full-body strength at your desk.',
+        sections: [
+          {
+            title: 'Warm-up',
+            items: [
+              ['Posture reset', '30 seconds. Feet flat, ribs down, shoulders relaxed.'],
+              ['Seated march', '20 total reps. Move slowly and stay tall.'],
+              ['Desk-supported hip hinges', '10 reps. Gentle range, neutral spine.']
+            ]
+          },
+          {
+            title: 'Workout — 2 to 3 rounds',
+            items: [
+              ['Slow chair sit-to-stands', '8–12 reps. Lower for 3 seconds, stand strong.'],
+              ['Desk push-up bottom hold', '5–8 reps with 3-second holds near the bottom.'],
+              ['Palm press-down desk isometric', '8 holds of 5 seconds. Press palms into the desk.'],
+              ['Seated leg extensions', '12 each leg. Hold the top for 2 seconds.'],
+              ['Seated knee lift holds', '8 each side with 3-second holds. Avoid leaning back.'],
+              ['Glute squeeze + calf raise combo', '12–15 reps. Squeeze glutes as you rise onto toes.']
+            ]
+          }
+        ]
+      },
+      5: {
+        badge: 'Friday',
+        title: 'Full Body E',
+        description: 'A slightly higher-rep desk circuit that still trains all major areas.',
+        sections: [
+          {
+            title: 'Warm-up',
+            items: [
+              ['Shoulder rolls + scapular squeezes', '10 rolls each direction, then 10 shoulder-blade squeezes.'],
+              ['Chair sit-to-stand warm-up', '8 easy reps.'],
+              ['Seated core brace', '5 holds of 8 seconds. Keep breathing.']
+            ]
+          },
+          {
+            title: 'Workout — 2 to 4 rounds',
+            items: [
+              ['Chair sit-to-stands', '12–15 reps. Smooth, steady pace.'],
+              ['Desk incline push-ups', '8–15 reps. Keep your body in a straight line.'],
+              ['Desk plank shoulder taps', '10–20 total taps. Hands on desk, tap opposite shoulder slowly.'],
+              ['Desk-supported hip abductions', '12 each side. Toes forward, torso still.'],
+              ['Standing calf raises', '20–25 reps. Pause at the top.'],
+              ['Seated knee lifts', '12 each side. Brace core and stay tall.'],
+              ['Scapular squeezes', '15 reps. Hold each squeeze 2 seconds.']
+            ]
+          }
+        ]
+      }
+    };
+
+    const WEEKEND_RESET = {
+      badge: 'Weekend',
+      title: 'Optional Desk Reset',
+      description: 'No required strength workout today. Use this short mobility reset if you want to keep the habit going.',
+      sections: [
+        {
+          title: 'Optional reset',
+          items: [
+            ['Seated posture reset', '30–60 seconds. Sit tall, feet flat, shoulders down.'],
+            ['Scapular squeezes', '10 slow reps.'],
+            ['Seated knee lifts', '10 each side.'],
+            ['Standing calf raises', '20 easy reps.'],
+            ['Standing glute squeezes', '5 holds of 10 seconds.'],
+            ['Desk-supported hip hinges', '10 gentle reps.']
+          ]
+        }
+      ]
+    };
+
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayLookup = { sunday:0, sun:0, monday:1, mon:1, tuesday:2, tue:2, wednesday:3, wed:3, thursday:4, thu:4, friday:5, fri:5, saturday:6, sat:6 };
+    const storagePrefix = 'minimalDeskWorkoutChecklist:';
+    const historyKey = 'minimalDeskWorkoutHistory:v1';
+    const weeklyGoal = 3;
+
+    function dateKey(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+
+    function addDays(date, amount) {
+      const next = new Date(date);
+      next.setDate(next.getDate() + amount);
+      return next;
+    }
+
+    function startOfWeekMonday(date) {
+      const start = new Date(date);
+      const day = start.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      start.setHours(0, 0, 0, 0);
+      start.setDate(start.getDate() + diff);
+      return start;
+    }
+
+    function isWeekday(date) {
+      const day = date.getDay();
+      return day >= 1 && day <= 5;
+    }
+
+    function readHistory() {
+      try { return JSON.parse(localStorage.getItem(historyKey)) || {}; }
+      catch (e) { return {}; }
+    }
+
+    function saveHistory(history) {
+      localStorage.setItem(historyKey, JSON.stringify(history));
+    }
+
+    function isCompletedDate(history, date) {
+      const entry = history[dateKey(date)];
+      return Boolean(entry && entry.complete);
+    }
+
+    function previewDayIndex() {
+      const params = new URLSearchParams(window.location.search);
+      const raw = (params.get('day') || params.get('preview') || '').trim().toLowerCase();
+      return Object.prototype.hasOwnProperty.call(dayLookup, raw) ? dayLookup[raw] : null;
+    }
+
+    function activeDayIndex() {
+      const preview = previewDayIndex();
+      if (preview !== null) {
+        document.body.classList.add('preview');
+        return preview;
+      }
+      document.body.classList.remove('preview');
+      return new Date().getDay();
+    }
+
+    function activeWorkout() {
+      const index = activeDayIndex();
+      return WORKOUTS[index] || WEEKEND_RESET;
+    }
+
+    function storageKey() {
+      const preview = previewDayIndex();
+      const suffix = preview !== null ? `preview-${dayNames[preview].toLowerCase()}` : dateKey(new Date());
+      return storagePrefix + suffix;
+    }
+
+    function readState() {
+      try { return JSON.parse(localStorage.getItem(storageKey())) || {}; }
+      catch (e) { return {}; }
+    }
+
+    function saveState(state) {
+      localStorage.setItem(storageKey(), JSON.stringify(state));
+    }
+
+    function clearOldKeys() {
+      if (previewDayIndex() !== null) return;
+      const todayKey = storageKey();
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(storagePrefix) && key !== todayKey && !key.includes('preview-')) {
+          localStorage.removeItem(key);
+        }
+      }
+    }
+
+    function updateProgress() {
+      const boxes = Array.from(document.querySelectorAll('input[type="checkbox"][data-item-id]'));
+      const complete = boxes.filter(box => box.checked).length;
+      const total = boxes.length;
+      const percent = total ? Math.round((complete / total) * 100) : 0;
+
+      document.getElementById('progressText').textContent = `${complete} of ${total} complete`;
+      document.getElementById('percentText').textContent = `${percent}%`;
+      document.getElementById('progressFill').style.width = `${percent}%`;
+      document.querySelector('.progress').setAttribute('aria-valuenow', String(percent));
+
+      boxes.forEach(box => {
+        const item = box.closest('li');
+        if (item) item.classList.toggle('complete', box.checked);
+      });
+
+      recordDayProgress(complete, total);
+      updateStats();
+    }
+
+    function recordDayProgress(complete, total) {
+      if (previewDayIndex() !== null || total === 0) return;
+
+      const today = new Date();
+      const index = today.getDay();
+      const history = readHistory();
+      history[dateKey(today)] = {
+        complete: total > 0 && complete === total,
+        completeCount: complete,
+        totalCount: total,
+        required: index >= 1 && index <= 5,
+        dayName: dayNames[index],
+        updatedAt: new Date().toISOString()
+      };
+      saveHistory(history);
+    }
+
+    function computeWeekStats(history, now) {
+      const monday = startOfWeekMonday(now);
+      const todayKey = dateKey(now);
+      let completed = 0;
+      let misses = 0;
+
+      for (let i = 0; i < 5; i++) {
+        const date = addDays(monday, i);
+        const key = dateKey(date);
+        const complete = Boolean(history[key] && history[key].complete);
+
+        if (key > todayKey) continue;
+        if (complete) completed++;
+
+        const isPastWeekday = key < todayKey;
+        const isWeekendView = now.getDay() === 0 || now.getDay() === 6;
+        const shouldCountMiss = isPastWeekday || (isWeekendView && key <= todayKey);
+        if (shouldCountMiss && !complete) misses++;
+      }
+
+      return { completed, misses };
+    }
+
+    function previousDateToCheck(now, history) {
+      const todayComplete = isCompletedDate(history, now);
+      const todayIsWeekday = isWeekday(now);
+
+      if (todayComplete) return new Date(now);
+      if (!todayIsWeekday) return addDays(now, -1);
+      return addDays(now, -1);
+    }
+
+    function computeStreak(history, now) {
+      let streak = 0;
+      let cursor = previousDateToCheck(now, history);
+
+      for (let safety = 0; safety < 730; safety++) {
+        const complete = isCompletedDate(history, cursor);
+        const weekday = isWeekday(cursor);
+
+        if (complete) {
+          streak++;
+        } else if (weekday) {
+          break;
+        }
+
+        cursor = addDays(cursor, -1);
+      }
+
+      return streak;
+    }
+
+    function updateStats() {
+      const history = readHistory();
+      const now = new Date();
+      const week = computeWeekStats(history, now);
+      const streak = computeStreak(history, now);
+      const remaining = Math.max(weeklyGoal - week.completed, 0);
+      const goalText = remaining === 0
+        ? 'Weekly goal met: 3+ desk workouts complete.'
+        : `Weekly goal: ${week.completed}/${weeklyGoal} complete. ${remaining} more to hit your goal.`;
+
+      document.getElementById('streakStat').textContent = streak;
+      document.getElementById('weekCompleteStat').textContent = week.completed;
+      document.getElementById('weekMissStat').textContent = week.misses;
+      document.getElementById('goalLine').textContent = goalText;
+    }
+
+    function itemId(sectionIndex, itemIndex) {
+      return `s${sectionIndex}-i${itemIndex}`;
+    }
+
+    function render() {
+      clearOldKeys();
+
+      const index = activeDayIndex();
+      const workout = WORKOUTS[index] || WEEKEND_RESET;
+      const state = readState();
+      const sections = document.getElementById('sections');
+      const now = new Date();
+      const dateDisplay = previewDayIndex() !== null
+        ? `${dayNames[index]} preview`
+        : `${dayNames[index]}, ${now.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}`;
+
+      document.getElementById('workoutTitle').textContent = workout.title;
+      document.getElementById('dayBadge').textContent = workout.badge;
+      document.getElementById('dateLine').textContent = dateDisplay;
+      document.getElementById('workoutDescription').textContent = workout.description;
+      sections.innerHTML = '';
+
+      workout.sections.forEach((section, sectionIndex) => {
+        const sectionEl = document.createElement('section');
+        const heading = document.createElement('h3');
+        heading.textContent = section.title;
+        sectionEl.appendChild(heading);
+
+        const list = document.createElement('ul');
+        section.items.forEach((exercise, itemIndex) => {
+          const id = itemId(sectionIndex, itemIndex);
+          const row = document.createElement('li');
+          const box = document.createElement('input');
+          const label = document.createElement('label');
+
+          box.type = 'checkbox';
+          box.id = id;
+          box.dataset.itemId = id;
+          box.checked = Boolean(state[id]);
+
+          label.setAttribute('for', id);
+          label.innerHTML = '<span class="name"></span><span class="detail"></span>';
+          label.querySelector('.name').textContent = exercise[0];
+          label.querySelector('.detail').textContent = exercise[1];
+
+          box.addEventListener('change', () => {
+            const current = readState();
+            current[id] = box.checked;
+            saveState(current);
+            updateProgress();
+          });
+
+          row.appendChild(box);
+          row.appendChild(label);
+          list.appendChild(row);
+        });
+
+        sectionEl.appendChild(list);
+        sections.appendChild(sectionEl);
+      });
+
+      updateProgress();
+    }
+
+    function scheduleMidnightReset() {
+      if (previewDayIndex() !== null) return;
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 2, 0);
+      window.setTimeout(() => {
+        render();
+        scheduleMidnightReset();
+      }, midnight.getTime() - now.getTime());
+    }
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      localStorage.removeItem(storageKey());
+      render();
+    });
+
+
+    render();
+    scheduleMidnightReset();
+  </script>
+
+</body>
+</html>
